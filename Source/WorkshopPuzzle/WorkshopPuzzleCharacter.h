@@ -11,7 +11,9 @@ class UInputComponent;
 UCLASS(config=Game)
 class AWorkshopPuzzleCharacter : public ACharacter
 {
+
 	GENERATED_BODY()
+
 
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
@@ -44,7 +46,6 @@ class AWorkshopPuzzleCharacter : public ACharacter
 	/** Motion controller (left hand) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UMotionControllerComponent* L_MotionController;
-
 public:
 	AWorkshopPuzzleCharacter();
 
@@ -79,7 +80,6 @@ public:
 	/** Whether to use motion controller location for aiming. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	uint32 bUsingMotionControllers : 1;
-
 protected:
 	
 	/** Fires a projectile. */
@@ -105,6 +105,8 @@ protected:
 	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
 	 */
 	void LookUpAtRate(float Rate);
+
+	
 
 	struct TouchData
 	{

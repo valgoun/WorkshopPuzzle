@@ -139,6 +139,7 @@ void AWorkshopPuzzleCharacter::SetupPlayerInputComponent(class UInputComponent* 
 
 void AWorkshopPuzzleCharacter::OnFire()
 {
+
 	// try and fire a projectile
 	if (ProjectileClass != NULL)
 	{
@@ -294,6 +295,6 @@ bool AWorkshopPuzzleCharacter::EnableTouchscreenMovement(class UInputComponent* 
 		//PlayerInputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AWorkshopPuzzleCharacter::TouchUpdate);
 		return true;
 	}
-	
+
 	return false;
 }
