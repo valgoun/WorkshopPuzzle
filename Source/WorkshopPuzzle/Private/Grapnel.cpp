@@ -33,14 +33,16 @@ void AGrapnel::Tick(float deltaTime)
 		if (actualDistance < maxDistanceGrapnel) {
 			
 			FVector location = grapnelComponent->GetComponentLocation();
-			FVector forward = GetActorForwardVector();
+			FVector forward = grapnelComponent->GetForwardVector();
 			const FVector newLocation = FVector(location + (forward * grapnelSpeed * deltaTime));
 			actualDistance += grapnelSpeed * deltaTime;
 			FHitResult overlapResult;
 			grapnelComponent->SetWorldLocation(newLocation, true, &overlapResult, ETeleportType::None);
 			if (overlapResult.GetActor() != nullptr) {
-				ResetGrapnel();
-				PullPlayer(overlapResult.Location);
+				if (overlapResult.GetActor()->GetRootComponent() != playerController->GetRootComponent()) {
+					ResetGrapnel();
+					PullPlayer(overlapResult.Location);
+				}
 			}
 		}
 		else {
