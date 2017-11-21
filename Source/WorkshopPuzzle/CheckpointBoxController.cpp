@@ -38,6 +38,7 @@ void ACheckpointBoxController::NotifyActorBeginOverlap(AActor * Other) {
 	AWorkshopPuzzleCharacter* player = Cast<AWorkshopPuzzleCharacter>(Other);
 
 	if (player) {
+		player->SetLastCheckpoint(this);
 		UE_LOG(LogTemp, Warning, TEXT("Coucou"));
 	}
 	

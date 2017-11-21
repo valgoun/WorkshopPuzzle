@@ -84,6 +84,7 @@ AWorkshopPuzzleCharacter::AWorkshopPuzzleCharacter()
 	//bUsingMotionControllers = true;
 
 	_originalBrakingDeceleration = GetCharacterMovement()->BrakingDecelerationWalking;
+	lastCheckpointPosition = GetActorLocation();
 }
 
 void AWorkshopPuzzleCharacter::BeginPlay()
@@ -304,6 +305,11 @@ void AWorkshopPuzzleCharacter::Dash()
 			moveCmp->BrakingDecelerationWalking = oldBrackingDeceleration;
 		}, DashTime, false);
 	}
+}
+
+void AWorkshopPuzzleCharacter::SetLastCheckpoint(ACheckpointBoxController* checkpoint)
+{
+	lastCheckpoint = checkpoint;
 }
 
 bool AWorkshopPuzzleCharacter::EnableTouchscreenMovement(class UInputComponent* PlayerInputComponent)

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "WorkshopPuzzleCharacter.generated.h"
+#include "CheckpointBoxController.h"
 
 class UInputComponent;
 
@@ -14,9 +15,8 @@ class AWorkshopPuzzleCharacter : public ACharacter
 
 	GENERATED_BODY()
 
-
-		/** Pawn mesh: 1st person view (arms; seen only by self) */
-		UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	/** Pawn mesh: 1st person view (arms; seen only by self) */
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 		class USkeletalMeshComponent* Mesh1P;
 
 	/** Gun mesh: 1st person view (seen only by self) */
@@ -91,6 +91,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		float DashTime;
+
 protected:
 
 	/** Fires a projectile. */
@@ -119,8 +120,6 @@ protected:
 
 	void Dash();
 
-
-
 	struct TouchData
 	{
 		TouchData() { bIsPressed = false; Location = FVector::ZeroVector; }
@@ -133,6 +132,14 @@ protected:
 	void EndTouch(const ETouchIndex::Type FingerIndex, const FVector Location);
 	void TouchUpdate(const ETouchIndex::Type FingerIndex, const FVector Location);
 	TouchData	TouchItem;
+
+	private:
+
+		ACheckpointBoxController* lastCheckpoint;
+
+	public:
+
+		void SetLastCheckpoint(ACheckpointBoxController* checkpoint);
 
 protected:
 	// APawn interface
