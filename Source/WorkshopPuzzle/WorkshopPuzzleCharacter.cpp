@@ -326,3 +326,8 @@ bool AWorkshopPuzzleCharacter::EnableTouchscreenMovement(class UInputComponent* 
 
 	return false;
 }
+
+void AWorkshopPuzzleCharacter::Kill()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Player Killed"));
+}
