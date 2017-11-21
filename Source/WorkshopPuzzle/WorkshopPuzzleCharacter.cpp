@@ -84,7 +84,6 @@ AWorkshopPuzzleCharacter::AWorkshopPuzzleCharacter()
 	//bUsingMotionControllers = true;
 
 	_originalBrakingDeceleration = GetCharacterMovement()->BrakingDecelerationWalking;
-	lastCheckpointPosition = GetActorLocation();
 }
 
 void AWorkshopPuzzleCharacter::BeginPlay()
@@ -106,6 +105,7 @@ void AWorkshopPuzzleCharacter::BeginPlay()
 		VR_Gun->SetHiddenInGame(true, true);
 		Mesh1P->SetHiddenInGame(false, true);
 	}
+	startingPosition = GetActorLocation();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -329,5 +329,13 @@ bool AWorkshopPuzzleCharacter::EnableTouchscreenMovement(class UInputComponent* 
 
 void AWorkshopPuzzleCharacter::Kill()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Player Killed"));
+	if (lastCheckpoint) {
+		SetActorLocation(lastCheckpoint->GetActorLocation());
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *startingPosition.ToString());
+		SetActorLocation(startingPosition);
+		auto moveCmp = GetCharacterMovement();
+		moveCmp->Velocity = FVector(0, 0, 0);
+	}
 }

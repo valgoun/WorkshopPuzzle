@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "WorkshopPuzzleCharacter.generated.h"
 #include "CheckpointBoxController.h"
+#include "WorkshopPuzzleCharacter.generated.h"
 
 class UInputComponent;
 
@@ -119,6 +119,8 @@ protected:
 	void LookUpAtRate(float Rate);
 
 	void Dash();
+
+	FVector startingPosition;
 
 	struct TouchData
 	{
