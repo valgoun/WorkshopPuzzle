@@ -19,6 +19,7 @@ void AGrapnel::BeginPlay()
 	playerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	SetupPlayerInputComponent(playerController->InputComponent);
 	isLaunching = false;
+	//LaunchGrapnel();
 }
 
 void AGrapnel::SetupPlayerInputComponent(UInputComponent* inputComponent) {
@@ -29,6 +30,7 @@ void AGrapnel::SetupPlayerInputComponent(UInputComponent* inputComponent) {
 void AGrapnel::Tick(float deltaTime)
 {
 	Super::Tick(deltaTime);
+
 	if (isLaunching) {
 		if (actualDistance < maxDistanceGrapnel) {
 			
@@ -40,8 +42,9 @@ void AGrapnel::Tick(float deltaTime)
 			grapnelComponent->SetWorldLocation(newLocation, true, &overlapResult, ETeleportType::None);
 			if (overlapResult.GetActor() != nullptr) {
 				if (overlapResult.GetActor()->GetRootComponent() != playerController->GetRootComponent()) {
-					ResetGrapnel();
+					
 					PullPlayer(overlapResult.Location);
+					ResetGrapnel();
 				}
 			}
 		}
@@ -55,16 +58,17 @@ void AGrapnel::Tick(float deltaTime)
 
 void AGrapnel::LaunchGrapnel() {
 	if (!isLaunching) {
-		UE_LOG(LogTemp, Warning, TEXT("Grap"));
+		//UE_LOG(LogTemp, Warning, TEXT("Grap"));
 		isLaunching = true;
 		actualDistance = 0;
 	}		
 }
 
 void AGrapnel::ResetGrapnel() {
-	const FVector newLocation = FVector(0, 0, 0);
+	/*const FVector newLocation = FVector(0, 0, 0);
 	grapnelComponent->SetRelativeLocation(newLocation, false, nullptr, ETeleportType::TeleportPhysics);
-	isLaunching = false;
+	isLaunching = false;*/
+	Destroy();
 }
 
 void AGrapnel::PullPlayer(FVector location) {
@@ -72,7 +76,7 @@ void AGrapnel::PullPlayer(FVector location) {
 	FVector playerPosition = playerController->GetPawn()->GetActorLocation();
 	//UE_LOG(LogTemp, Warning, TEXT("%s"), *playerActor.GetWorldLocation().ToString());
 	FVector direction = UKismetMathLibrary::GetDirectionUnitVector(playerPosition, location) * launchPlayerSpeed;
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *direction.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("%s"), *direction.ToString());
 	playerCharacter->LaunchCharacter(direction, true, true);
 }
 
@@ -80,7 +84,6 @@ void AGrapnel::SetGrapnelComponent(UStaticMeshComponent* grapnelComponent) {
 	this->grapnelComponent = grapnelComponent;
 }
 
-void AGrapnel::SetPlayerActor(AActor* playerActor) {
+/*void AGrapnel::SetPlayerActor(AActor* playerActor) {
 	this->playerActor = playerActor;
-
-}
+}*/

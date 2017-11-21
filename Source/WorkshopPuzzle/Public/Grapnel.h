@@ -36,7 +36,7 @@ public:
 private:
 	float actualDistance;
 	UStaticMeshComponent* grapnelComponent;
-	AActor* playerActor;
+	//AActor* playerActor;
 	APlayerController* playerController;
 	ACharacter* playerCharacter;
 
@@ -45,17 +45,14 @@ public:
 	AGrapnel();
 
 private:
-	UFUNCTION(BlueprintCallable, Category="Grapnel")
-	void LaunchGrapnel();
-
 	UFUNCTION(BlueprintCallable, Category = "Grapnel")
 	void ResetGrapnel();
 
 	UFUNCTION(BlueprintCallable, Category = "Grapnel")
 	void SetGrapnelComponent(UStaticMeshComponent* grapnelComponent);
 
-	UFUNCTION(BlueprintCallable, Category = "Grapnel")
-	void SetPlayerActor(AActor* playerActor);
+	//UFUNCTION(BlueprintCallable, Category = "Grapnel")
+	//void SetPlayerActor(AActor* playerActor);
 
 protected:
 	// Called when the game starts or when spawned
@@ -69,4 +66,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Grapnel")
 	void PullPlayer(FVector location);
 	
+	UFUNCTION(BlueprintCallable, Category = "Grapnel")
+	void LaunchGrapnel();
 };
