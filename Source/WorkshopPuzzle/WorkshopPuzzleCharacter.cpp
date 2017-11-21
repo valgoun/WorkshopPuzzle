@@ -10,6 +10,7 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "MotionControllerComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -81,6 +82,8 @@ AWorkshopPuzzleCharacter::AWorkshopPuzzleCharacter()
 
 	// Uncomment the following line to turn motion controllers on by default:
 	//bUsingMotionControllers = true;
+
+	_originalBrakingDeceleration = GetCharacterMovement()->BrakingDecelerationWalking;
 }
 
 void AWorkshopPuzzleCharacter::BeginPlay()
@@ -117,7 +120,7 @@ void AWorkshopPuzzleCharacter::SetupPlayerInputComponent(class UInputComponent* 
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	// Bind fire event
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AWorkshopPuzzleCharacter::OnFire);
+	//PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AWorkshopPuzzleCharacter::OnFire);
 
 	// Enable touchscreen input
 	EnableTouchscreenMovement(PlayerInputComponent);
@@ -135,55 +138,58 @@ void AWorkshopPuzzleCharacter::SetupPlayerInputComponent(class UInputComponent* 
 	PlayerInputComponent->BindAxis("TurnRate", this, &AWorkshopPuzzleCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AWorkshopPuzzleCharacter::LookUpAtRate);
+
+	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AWorkshopPuzzleCharacter::Dash);
 }
 
-void AWorkshopPuzzleCharacter::OnFire()
-{
-	// try and fire a projectile
-	if (ProjectileClass != NULL)
-	{
-		UWorld* const World = GetWorld();
-		if (World != NULL)
-		{
-			if (bUsingMotionControllers)
-			{
-				const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
-				const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
-				World->SpawnActor<AWorkshopPuzzleProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
-			}
-			else
-			{
-				const FRotator SpawnRotation = GetControlRotation();
-				// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-				const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
-
-				//Set Spawn Collision Handling Override
-				FActorSpawnParameters ActorSpawnParams;
-				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-
-				// spawn the projectile at the muzzle
-				World->SpawnActor<AWorkshopPuzzleProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-			}
-		}
-	}
-
-	// try and play the sound if specified
-	if (FireSound != NULL)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-	}
-
-	// try and play a firing animation if specified
-	if (FireAnimation != NULL)
-	{
-		// Get the animation object for the arms mesh
-		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
-		if (AnimInstance != NULL)
-		{
-			AnimInstance->Montage_Play(FireAnimation, 1.f);
-		}
-	}
-}
+//void AWorkshopPuzzleCharacter::OnFire()
+//{
+//
+//	// try and fire a projectile
+//	if (ProjectileClass != NULL)
+//	{
+//		UWorld* const World = GetWorld();
+//		if (World != NULL)
+//		{
+//			if (bUsingMotionControllers)
+//			{
+//				const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
+//				const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
+//				World->SpawnActor<AWorkshopPuzzleProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
+//			}
+//			else
+//			{
+//				const FRotator SpawnRotation = GetControlRotation();
+//				// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+//				const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
+//
+//				//Set Spawn Collision Handling Override
+//				FActorSpawnParameters ActorSpawnParams;
+//				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+//
+//				// spawn the projectile at the muzzle
+//				World->SpawnActor<AWorkshopPuzzleProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+//			}
+//		}
+//	}
+//
+//	// try and play the sound if specified
+//	if (FireSound != NULL)
+//	{
+//		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+//	}
+//
+//	// try and play a firing animation if specified
+//	if (FireAnimation != NULL)
+//	{
+//		// Get the animation object for the arms mesh
+//		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
+//		if (AnimInstance != NULL)
+//		{
+//			AnimInstance->Montage_Play(FireAnimation, 1.f);
+//		}
+//	}
+//}
 
 void AWorkshopPuzzleCharacter::OnResetVR()
 {
@@ -210,7 +216,7 @@ void AWorkshopPuzzleCharacter::EndTouch(const ETouchIndex::Type FingerIndex, con
 	}
 	if ((FingerIndex == TouchItem.FingerIndex) && (TouchItem.bMoved == false))
 	{
-		OnFire();
+		//OnFire();
 	}
 	TouchItem.bIsPressed = false;
 }
@@ -283,6 +289,23 @@ void AWorkshopPuzzleCharacter::LookUpAtRate(float Rate)
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
+void AWorkshopPuzzleCharacter::Dash()
+{
+	LaunchCharacter(GetActorForwardVector() * DashVelocity, false, false);
+
+	auto moveCmp = GetCharacterMovement();
+
+	if (moveCmp->MovementMode == EMovementMode::MOVE_Walking)
+	{
+		int oldBrackingDeceleration = _originalBrakingDeceleration;
+		moveCmp->BrakingDecelerationWalking = 0.0;
+		GetWorldTimerManager().ClearTimer(_dashTimer);
+		GetWorldTimerManager().SetTimer(_dashTimer, [this, oldBrackingDeceleration, moveCmp]() {
+			moveCmp->BrakingDecelerationWalking = oldBrackingDeceleration;
+		}, DashTime, false);
+	}
+}
+
 bool AWorkshopPuzzleCharacter::EnableTouchscreenMovement(class UInputComponent* PlayerInputComponent)
 {
 	if (FPlatformMisc::SupportsTouchInput() || GetDefault<UInputSettings>()->bUseMouseForTouch)
@@ -294,6 +317,6 @@ bool AWorkshopPuzzleCharacter::EnableTouchscreenMovement(class UInputComponent* 
 		//PlayerInputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AWorkshopPuzzleCharacter::TouchUpdate);
 		return true;
 	}
-	
+
 	return false;
 }
