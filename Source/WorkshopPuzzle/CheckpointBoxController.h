@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "FinishBoxController.generated.h"
+#include "CheckpointBoxController.generated.h"
 
 UCLASS()
-class WORKSHOPPUZZLE_API AFinishBoxController : public AActor
+class WORKSHOPPUZZLE_API ACheckpointBoxController : public AActor
 {
 	GENERATED_BODY()
 	UPROPERTY()
@@ -15,7 +15,7 @@ class WORKSHOPPUZZLE_API AFinishBoxController : public AActor
 	
 public:	
 	// Sets default values for this actor's properties
-	AFinishBoxController();
+	ACheckpointBoxController();
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,5 +26,4 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void NotifyActorBeginOverlap(AActor* Other) override;
-	
 };

@@ -45,6 +45,3 @@ void AFinishBoxController::NotifyActorBeginOverlap(AActor * Other)
 		UGameplayStatics::OpenLevel(world, "Level"+ newLevelIndex);
 	}
 }
-
-void AFinishBoxController::NotifyActorEndOverlap(AActor * Other) { }
-
