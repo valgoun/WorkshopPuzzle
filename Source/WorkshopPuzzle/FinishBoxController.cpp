@@ -2,6 +2,8 @@
 
 #include "FinishBoxController.h"
 #include "Runtime/Engine/Classes/Components/SphereComponent.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Runtime/Core/Public/Misc/Paths.h"
 
 // Sets default values
 AFinishBoxController::AFinishBoxController()
@@ -33,11 +35,16 @@ void AFinishBoxController::Tick(float DeltaTime)
 
 void AFinishBoxController::NotifyActorBeginOverlap(AActor * Other)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Caca"));
+	UObject* world = Cast<UObject>(GetWorld());
+
+	FString actualLevel = UGameplayStatics::GetCurrentLevelName(world);
+	actualLevel.Replace(TEXT("Level"), TEXT(""));
+	int newLevelIndex = FCString::Atoi(*actualLevel) + 1;
+
+	if (FPaths::FileExists(TEXT("Level" + newLevelIndex))) {
+		UGameplayStatics::OpenLevel(world, "Level"+ newLevelIndex);
+	}
 }
 
-void AFinishBoxController::NotifyActorEndOverlap(AActor * Other)
-{
-
-}
+void AFinishBoxController::NotifyActorEndOverlap(AActor * Other) { }
 
