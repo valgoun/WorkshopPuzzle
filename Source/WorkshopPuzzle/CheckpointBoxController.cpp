@@ -2,7 +2,7 @@
 
 #include "CheckpointBoxController.h"
 #include "Runtime/Engine/Classes/Components/SphereComponent.h"
-
+#include "WorkshopPuzzleCharacter.h"
 
 // Sets default values
 ACheckpointBoxController::ACheckpointBoxController()
@@ -12,6 +12,12 @@ ACheckpointBoxController::ACheckpointBoxController()
 
 	Trigger = CreateDefaultSubobject<USphereComponent>(TEXT("TriggerCollider"));
 
+	// Both colliders need to have this set to true for events to fire
+	Trigger->bGenerateOverlapEvents = true;
+
+	// Set the collision mode for the collider
+	// This mode will only enable the collider for raycasts, sweeps, and overlaps
+	Trigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 
 // Called when the game starts or when spawned
@@ -27,4 +33,12 @@ void ACheckpointBoxController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ACheckpointBoxController::NotifyActorBeginOverlap(AActor * Other) { }
+void ACheckpointBoxController::NotifyActorBeginOverlap(AActor * Other) {
+
+	AWorkshopPuzzleCharacter* player = Cast<AWorkshopPuzzleCharacter>(Other);
+
+	if (player) {
+		UE_LOG(LogTemp, Warning, TEXT("Coucou"));
+	}
+	
+}

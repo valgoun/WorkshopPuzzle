@@ -4,6 +4,7 @@
 #include "Runtime/Engine/Classes/Components/SphereComponent.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Runtime/Core/Public/Misc/Paths.h"
+#include "WorkshopPuzzleCharacter.h"
 
 // Sets default values
 AFinishBoxController::AFinishBoxController()
@@ -35,13 +36,18 @@ void AFinishBoxController::Tick(float DeltaTime)
 
 void AFinishBoxController::NotifyActorBeginOverlap(AActor * Other)
 {
-	UObject* world = Cast<UObject>(GetWorld());
+	AWorkshopPuzzleCharacter* player = Cast<AWorkshopPuzzleCharacter>(Other);
 
-	FString actualLevel = UGameplayStatics::GetCurrentLevelName(world);
-	actualLevel.Replace(TEXT("Level"), TEXT(""));
-	int newLevelIndex = FCString::Atoi(*actualLevel) + 1;
+	if (player) {
+		UObject* world = Cast<UObject>(GetWorld());
 
-	if (FPaths::FileExists(TEXT("Level" + newLevelIndex))) {
-		UGameplayStatics::OpenLevel(world, "Level"+ newLevelIndex);
+		FString actualLevel = UGameplayStatics::GetCurrentLevelName(world);
+		actualLevel.Replace(TEXT("Level"), TEXT(""));
+		int newLevelIndex = FCString::Atoi(*actualLevel) + 1;
+
+		if (FPaths::FileExists(TEXT("Level" + newLevelIndex))) {
+			UGameplayStatics::OpenLevel(world, "Level" + newLevelIndex);
+		}
 	}
+	
 }
