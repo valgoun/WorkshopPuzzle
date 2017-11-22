@@ -333,9 +333,9 @@ void AWorkshopPuzzleCharacter::Kill()
 		SetActorLocation(lastCheckpoint->GetActorLocation());
 	}
 	else {
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *startingPosition.ToString());
 		SetActorLocation(startingPosition);
-		auto moveCmp = GetCharacterMovement();
-		moveCmp->Velocity = FVector(0, 0, 0);
 	}
+
+	auto moveCmp = GetCharacterMovement();
+	moveCmp->Velocity = FVector(0, 0, 0);
 }
